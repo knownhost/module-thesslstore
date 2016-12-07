@@ -49,8 +49,8 @@
                 </ul>
             </div>
 			<div class="links_row button_row">
-			    <a class = "btn_right submit save_price" href="#"><?php $this->_("ThesslstoreModule.credential_row.add_btn");?></a>
-			    <a target="_blank" class="btn_right" href="<?php $this->Html->_($reseller_price_link); ?>"><?php $this->_("ThesslstoreModule.setup_price.view_reseller_price"); ?> </a>
+			    <a class = "pull-right btn btn-primary submit save_price" href="#"><?php $this->_("ThesslstoreModule.credential_row.add_btn");?></a>
+			    <a target="_blank" class="pull-right btn btn-default" href="<?php $this->Html->_($reseller_price_link); ?>"><?php $this->_("ThesslstoreModule.setup_price.view_reseller_price"); ?> </a>
             </div>
 			<table class="table">
 			    <tbody>
@@ -184,7 +184,7 @@
 			</table>
 
 
-			<div class="button_row"><a class="btn_right submit save_price" href="#"><?php $this->_("ThesslstoreModule.credential_row.add_btn");?></a></div>
+			<div class="button_row"><a class="pull-right btn btn-primary submit save_price" href="#"><?php $this->_("ThesslstoreModule.credential_row.add_btn");?></a></div>
 			<?php
 			$this->Form->end();
 			?>
