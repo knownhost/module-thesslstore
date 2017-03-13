@@ -104,25 +104,24 @@ if($use_central_api != true )
                             Certificate Authority for validation. You should receive an email from them shortly to approve it.
                         </p>
                     <?php
-                    }
-					else if($auth_file_name == 'fileauth.txt'){
-						?>
-						<p>
-							For File Based Authentication, Please create a folder structure "/.well-known/pki-validation/" under root directory and create file using following details or download the Authentication file by clicking the "Download Auth File" button and place it in the "/.well-known/pki-validation/" of the HTTP server, like so: http://www.example.com/.well-known/pki-validation/<?php $this->Html->_($auth_file_name); ?> It may take some time for file to be automatically validated and cert to be issued by Certificate Authority.
-						</p>
-						<p>
-							File Name: <?php $this->Html->_($auth_file_name); ?>
-						</p>
-						<p>
-							File Content: <?php $this->Html->_($auth_file_content); ?>
-						</p>
-						<p>
-							<a href="<?php $this->Html->_($download_auth_file_link); ?>" class="btn btn-default btn-xs" type="button">
-								<?php $this->_("ThesslstoreModule.tab_DownloadAuthFile");?>
-							</a>
-						</p>
-						<?php
-					}
+                    } else if($auth_file_name == 'fileauth.txt'){
+			?>
+			<p>
+				For File Based Authentication, Please create a folder structure "/.well-known/pki-validation/" under root directory and create file using following details or download the Authentication file by clicking the "Download Auth File" button and place it in the "/.well-known/pki-validation/" of the HTTP server, like so: http://www.example.com/.well-known/pki-validation/<?php $this->Html->_($auth_file_name); ?> It may take some time for file to be automatically validated and cert to be issued by Certificate Authority.
+			</p>
+			<p>
+				File Name: <?php $this->Html->_($auth_file_name); ?>
+			</p>
+			<p>
+				File Content: <?php $this->Html->_($auth_file_content); ?>
+			</p>
+			<p>
+				<a href="<?php $this->Html->_($download_auth_file_link); ?>" class="btn btn-default btn-xs" type="button">
+					<?php $this->_("ThesslstoreModule.tab_DownloadAuthFile");?>
+				</a>
+			</p>
+			<?php
+		    }
                     else{
                         ?>
                         <p>
