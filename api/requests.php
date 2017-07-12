@@ -195,6 +195,7 @@ class order_neworder_request extends baserequest
     public $SignatureHashAlgorithm;
     public $CertTransparencyIndicator = false;
     public $DateTimeCulture = 'en-US';
+    public $CSRUniqueValue;
 }
 
 
@@ -298,6 +299,7 @@ class order_reissue_request extends baserequest
     public $ApproverEmails;
     public $CertTransparencyIndicator;
     public $DateTimeCulture;
+    public $CSRUniqueValue;
 }
 
 class order_resend_request extends baserequest
