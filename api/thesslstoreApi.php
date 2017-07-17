@@ -25,7 +25,7 @@ class thesslstoreApi
     private $_IsUsedForTokenSystem=false;
     private $_userAgent='';
 
-    function __construct($partnerCode,$authToken,$token,$tokenID,$tokenCode,$IsUsedForTokenSystem,$apimode, $userAgent = 'Blesta-1.0.0')
+    function __construct($partnerCode,$authToken,$token,$tokenID,$tokenCode,$IsUsedForTokenSystem,$apimode, $userAgent = 'Blesta-1.4.0')
     {
             $this->EnsurePHPVersion();
             $this->_apimode = $apimode;
@@ -165,9 +165,9 @@ class thesslstoreApi
 		   return 'https://api.thesslstore.com/rest';
 		}
 		else
-                {
-                    return 'https://sandbox-wbapi.thesslstore.com/rest'; 
-                }
+        {
+            return 'https://sandbox-wbapi.thesslstore.com/rest';
+        }
 	}
 
     /**

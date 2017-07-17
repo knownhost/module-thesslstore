@@ -8,7 +8,7 @@ class ThesslstoreModule extends Module {
     /**
      * @var string The version of this module
      */
-    private static $version = "1.3.0";
+    private static $version = "1.4.0";
 
     /**
      * @var string The name of this module
@@ -1667,6 +1667,10 @@ class ThesslstoreModule extends Module {
                     $new_order->FileAuthDVIndicator = true;
                     $new_order->HTTPSFileAuthDVIndicator = false;
                     $new_order->ApproverEmail = $order_status_response->ApproverEmail;
+                    if($order_status_response->VendorName == 'COMODO'){
+                        $new_order->CSRUniqueValue = date('YmdHisa');
+                    }
+
                 }
                 else{
                     $new_order->FileAuthDVIndicator = false;
@@ -2615,11 +2619,17 @@ class ThesslstoreModule extends Module {
             $new_order->FileAuthDVIndicator = true;
             $new_order->HTTPSFileAuthDVIndicator = false;
             $new_order->ApproverEmail = 'administrator@'.$clean_domain_name;
+            if($vendor_name == 'COMODO'){
+                $new_order->CSRUniqueValue = date('YmdHisa');
+            }
         }
         elseif($auth_method == 'HTTPS'){
             $new_order->FileAuthDVIndicator = false;
             $new_order->HTTPSFileAuthDVIndicator = true;
             $new_order->ApproverEmail = 'administrator@'.$clean_domain_name;
+            if($vendor_name == 'COMODO'){
+                $new_order->CSRUniqueValue = date('YmdHisa');
+            }
         }
         else{
             $new_order->FileAuthDVIndicator = false;
@@ -2932,10 +2942,16 @@ class ThesslstoreModule extends Module {
         $order_reissue_req->FileAuthDVIndicator = false;
         if($vars->thesslstore_auth_method == 'HTTP') {
             $order_reissue_req->FileAuthDVIndicator = true;
+            if($vendor_name == 'COMODO'){
+                $order_reissue_req->CSRUniqueValue = date('YmdHisa');
+            }
         }
         $order_reissue_req->HTTPSFileAuthDVIndicator = false;
         if($vars->thesslstore_auth_method == 'HTTPS'){
             $order_reissue_req->HTTPSFileAuthDVIndicator = true;
+            if($vendor_name == 'COMODO'){
+                $order_reissue_req->CSRUniqueValue = date('YmdHisa');
+            }
         }
         $order_reissue_req->CNAMEAuthDVIndicator = false;
         $order_reissue_req->ApproverEmails = $order_status_resp->ApproverEmail;
