@@ -23,13 +23,16 @@
 
     <?php if(($orderMajorStatus=='Pending' || $orderMinorStatus=='PENDING_REISSUE')&& $fileContent=='' && $fileName=='')
     {
-        $this->Form->create($this->base_uri . "clients/servicetab/" . $this->Html->ifSet($clientID) . "/" . $this->Html->ifSet($serviceID) . "/tabAdminChangeApproverEmail/");
-        ?>
-        <div class="button_row">
-            <a class="btn btn-default submit" href="<?php $this->base_uri . "clients/servicetab/" . $this->Html->ifSet($clientID) . "/" . $this->Html->ifSet($serviceID) . "/tabAdminChangeApproverEmail/"?>"><?php $this->_("ThesslstoreModule.tab_ChangeApproverEmail");?></a>
-        </div>
-        <?php
-        $this->Form->end();
+        if($VendorName=='COMODO' || ($hide_changeapprover_option != "YES" && $VendorName!='COMODO'))
+        {
+            $this->Form->create($this->base_uri . "clients/servicetab/" . $this->Html->ifSet($clientID) . "/" . $this->Html->ifSet($serviceID) . "/tabAdminChangeApproverEmail/");
+            ?>
+            <div class="button_row">
+                <a class="btn btn-default submit" href="<?php $this->base_uri . "clients/servicetab/" . $this->Html->ifSet($clientID) . "/" . $this->Html->ifSet($serviceID) . "/tabAdminChangeApproverEmail/"?>"><?php $this->_("ThesslstoreModule.tab_ChangeApproverEmail");?></a>
+            </div>
+            <?php
+            $this->Form->end();
+        }
     } ?>
 
     <?php if(($orderMajorStatus=='Pending' || $orderMinorStatus=='PENDING_REISSUE')&& $fileContent=='' && $fileName=='')

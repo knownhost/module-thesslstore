@@ -27,6 +27,7 @@ $lang['ThesslstoreModule.add_credential_row'] = "Add Credential";
 $lang['ThesslstoreModule.edit_credential_row'] = "Update Credential";
 $lang['ThesslstoreModule.import_product_row'] = "Import Packages";
 $lang['ThesslstoreModule.setup_price_row'] = "Setup Package Pricing";
+$lang['ThesslstoreModule.replacement_order_row'] = "Symantec Replacement Orders List";
 $lang['ThesslstoreModule.add_row.box_title'] = "Manage Credential";
 $lang['ThesslstoreModule.add_row.basic_title'] = "Add Credential";
 
@@ -51,6 +52,7 @@ $lang['ThesslstoreModule.row_meta.api_auth_token_test'] = "Test AuthToken";
 $lang['ThesslstoreModule.row_meta.api_mode'] = "Operation Mode";
 $lang['ThesslstoreModule.row_meta.product_group'] = "Select Package Group";
 $lang['ThesslstoreModule.row_meta.profit_margin'] = "Enter Desired Profit Margin";
+$lang['ThesslstoreModule.row_meta.hide_changeapprover_option'] = "Hide Change Approver Email Option For Symantec DV Products?";
 
 $lang['ThesslstoreModule.credential_row.add_btn'] = "Save";
 $lang['ThesslstoreModule.import_packages_row.add_btn'] = "Import Packages";
@@ -104,6 +106,7 @@ $lang['ThesslstoreModule.tab_reissue_cert.submit'] = "Re-Issue";
 $lang['ThesslstoreModule.tab_select_approver_email'] = "Select Approver Email";
 $lang['ThesslstoreModule.tab_ChangeApproverEmail'] = "Change Approver Email";
 $lang['ThesslstoreModule.!error.change_approver_email_not_available_for_order'] = "Change Approver Email feature is not available for this order.";
+$lang['ThesslstoreModule.!error.change_approver_email_not_available_for_product'] = "Change Approver Email feature is not available for this certificate.";
 $lang['ThesslstoreModule.!error.resend_approver_email_not_available_for_order'] = "Resend Approver Email feature is not available for this order.";
 $lang['ThesslstoreModule.success.change_approver_email'] = "Approver Email changed successfully";
 
@@ -181,4 +184,9 @@ $lang['ThesslstoreModule.!error.resend_invalid_status'] = "Resend Approver Email
 $lang['ThesslstoreModule.tab_ReissueCert'] = "Re-issue Certificate";
 
 $lang['ThesslstoreModule.tab_AdminManagementAction'] = "Management Actions";
+
+//Symantec Replacement Order Related
+$lang['ThesslstoreModule.replacement_order.box_title'] = "Symantec Replacement Orders List";
+$lang['ThesslstoreModule.replacement_order.export_csv'] = "Export to CSV";
+$lang['ThesslstoreModule.row_meta.replace_date'] = "Replace By Date";
 ?>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * TheSslStore Module
  *
@@ -8,7 +9,7 @@ class ThesslstoreModule extends Module {
     /**
      * @var string The version of this module
      */
-    private static $version = "1.4.0";
+    private static $version = "1.5.0";
 
     /**
      * @var string The name of this module
@@ -519,7 +520,7 @@ class ThesslstoreModule extends Module {
             if(isset($row->meta->thesslstore_reseller_name)){
 
                 $credential_added = true;
-
+                $link_buttons[] = array('name'=>Language::_("ThesslstoreModule.replacement_order_row",true),'attributes'=>array('href'=>array('href'=>$this->base_uri . "settings/company/modules/addrow/" . $module->id."?scr=replacementorder")));
                 $link_buttons[] = array('name'=>Language::_("ThesslstoreModule.edit_credential_row", true), 'attributes'=>array('href'=>$this->base_uri . "settings/company/modules/addrow/" . $module->id."?scr=editcredential"));
                 $link_buttons[] = array('name'=>Language::_("ThesslstoreModule.import_product_row",true),'attributes'=>array('href'=>array('href'=>$this->base_uri . "settings/company/modules/addrow/" . $module->id."?scr=importpackage")));
                 $link_buttons[] = array('name'=>Language::_("ThesslstoreModule.setup_price_row",true),'attributes'=>array('href'=>array('href'=>$this->base_uri . "settings/company/modules/addrow/" . $module->id."?scr=setupprice")));
@@ -778,6 +779,81 @@ class ThesslstoreModule extends Module {
             $this->view->set("api_mode",$api_mode);
             $this->view->set("reseller_pricing",$reseller_pricing);
             return $this->view->fetch();
+        }elseif($scr == "replacementorder"){
+            //This function is just called to set row meta because in current method row meta is not set by blesta.
+            $this->getApi();
+
+            $this->view = new View("replacement_orders", "default");
+            $this->view->base_uri = $this->base_uri;
+            $this->view->setDefaultView("components" . DS . "modules" . DS . "thesslstore_module" . DS);
+
+            // Load the helpers required for this view
+            Loader::loadHelpers($this, array("Form", "Html", "Widget"));
+
+            $api = $this->getApi();
+            $orders=array();
+            $orderReplacementRequest = new order_replacement_request();
+            if(isset($_REQUEST['date'])) {
+                $replace_by_date = $_REQUEST['date'];
+                $replace_by_date = strtotime($replace_by_date); //return timestamp in second.
+                $replacebydate = $replace_by_date*1000; //convert into millisecond
+                $orderReplacementRequest->ReplaceByDate = "/Date($replacebydate)/";
+            }
+            $this->log($this->api_partner_code . "|ssl-products", serialize($orderReplacementRequest), "input", true);
+            if($api->order_replacement($orderReplacementRequest)->AuthResponse->isError==false)
+            {
+                $orders = $api->order_replacement($orderReplacementRequest)->Orders;
+            }
+            $export_to_csv_link = explode("?",$_SERVER['REQUEST_URI']);
+            $export_to_csv_link = $export_to_csv_link[0]."?scr=exportcsv";
+            $this->view->set("vars", (object)$vars);
+            $this->view->set("orders",$orders);
+            $this->view->set("export_to_csv_link",$export_to_csv_link);
+            return $this->view->fetch();
+        }elseif($scr == "exportcsv"){
+
+            //This function is just called to set row meta because in current method row meta is not set by blesta.
+            $this->getApi();
+
+            $api = $this->getApi();
+
+            $orderReplacementRequest = new order_replacement_request();
+
+            $this->log($this->api_partner_code . "|ssl-products", serialize($orderReplacementRequest), "input", true);
+            $orders = $api->order_replacement($orderReplacementRequest)->Orders;
+
+            header('Content-Type: text/csv; charset=utf-8');
+            header('Content-Disposition: attachment; filename=symantecreplacementorders.csv');
+
+            // create a file pointer connected to the output stream
+            $output = fopen('php://output', 'w');
+            $delimiter = ",";
+            $enclosure = '"';
+            $heading = array('Date', 'TheSSLStore Order ID','Vendor ID', 'Product Name', 'Common Name','Issued Date', 'Expire Date','Status','Action', 'Replace By Date');
+
+            // output the column headings
+            fputcsv($output, $heading, $delimiter, $enclosure);
+
+
+            // fetch the data
+            foreach ($orders as $row) {
+                $line = array();
+                $line[] = $row->PurchaseDate;
+                $line[] = $row->TheSSLStoreOrderID;
+                $line[] = $row->VendorOrderID;
+                $line[] = $row->ProductName;
+                $line[] = $row->CommonName;
+                $line[] = $row->CertificateStartDate;
+                $line[] = $row->CertificateEndDate;
+                $line[] = $row->Status;
+                $line[] = $row->Action;
+                $line[] = $row->ReplaceByDate;
+
+                fputcsv($output, $line, $delimiter, $enclosure);
+            }
+
+            fclose($output);
+            exit;
         }
         else{
             $this->view = new View("invalid_action", "default");
@@ -813,7 +889,7 @@ class ThesslstoreModule extends Module {
                 }
             }
             $meta_fields = array("thesslstore_reseller_name","api_partner_code_live", "api_auth_token_live", "api_partner_code_test",
-                "api_auth_token_test", "api_mode");
+                "api_auth_token_test", "api_mode", "hide_changeapprover_option");
             $encrypted_fields = array("api_partner_code_live", "api_auth_token_live", "api_partner_code_test", "api_auth_token_test");
 
 
@@ -847,8 +923,12 @@ class ThesslstoreModule extends Module {
                 }
             }
             $this->Input->setRules($this->getCredentialRules($vars));
-
-            // Validate module row
+            if(!empty($vars['hide_changeapprover_option'])){
+                $hide_changeapprover_option=$vars['hide_changeapprover_option'];
+            }
+            else{
+                $hide_changeapprover_option='NO';
+            }
             if ($this->Input->validates($vars)) {
                 $meta['thesslstore_reseller_name'] = $vars['thesslstore_reseller_name'];
                 $meta['api_partner_code_live'] = $vars['api_partner_code_live'];
@@ -856,6 +936,7 @@ class ThesslstoreModule extends Module {
                 $meta['api_partner_code_test'] = $vars['api_partner_code_test'];
                 $meta['api_auth_token_test'] = $vars['api_auth_token_test'];
                 $meta['api_mode'] = $vars['api_mode'];
+                $meta['hide_changeapprover_option'] = $hide_changeapprover_option;
 
                 Loader::loadModels($this, array("ModuleManager"));
                 $this->ModuleManager->editRow($vars['module_row_id'], $meta);
@@ -1251,7 +1332,13 @@ class ThesslstoreModule extends Module {
 
             }
 
+        }elseif($scr == 'replacementorder'){
+            $replace_by_date = $vars['replace_by_date'];
+            $url = explode("?",$_SERVER['REQUEST_URI']);
+            header('Location:' . $url[0].'?scr=replacementorder&date='.$replace_by_date);
+            exit();
         }
+
     }
 
     /**
@@ -1279,7 +1366,7 @@ class ThesslstoreModule extends Module {
         $scr = isset($_GET['scr']) ? $_GET['scr'] : '';
         if($scr == 'editcredential') {
             $meta_fields = array("thesslstore_reseller_name","api_partner_code_live", "api_auth_token_live", "api_partner_code_test",
-                "api_auth_token_test", "api_mode");
+                "api_auth_token_test", "api_mode", "hide_changeapprover_option");
             $encrypted_fields = array("api_partner_code_live", "api_auth_token_live", "api_partner_code_test", "api_auth_token_test");
 
             // Validate module row
@@ -1854,6 +1941,7 @@ class ThesslstoreModule extends Module {
             $service_fields = $this->serviceFieldsToObject($service->fields);
 
             $order_resp = $this->getSSLOrderStatus($service_fields->thesslstore_order_id);
+
             if($order_resp) {
                 $vendor_name = $package->meta->thesslstore_vendor_name;
                 $is_code_signing = $package->meta->thesslstore_is_code_signing;
@@ -1899,9 +1987,20 @@ class ThesslstoreModule extends Module {
                 if ($vendor_name == 'CERTUM' || $is_scan_product == 'y' || $is_code_signing == 'y') {
                     $certificate['generation_link'] = $order_resp->TinyOrderLink;
                 }
-
+                //Display Replacement order alert message for symantec products
+                $sslConfigCompleteDetails = '';
+                if ($order_resp->VendorName == 'SYMANTEC' && $order_resp->OrderStatus->MajorStatus== 'Active') {
+                    $api = $this->getApi();
+                    $orderReplacementRequest = new order_replacement_request();
+                    $orderReplacementRequest->TheSSLStoreOrderID = $order_resp->TheSSLStoreOrderID;
+                    $orderReplacementResp=$api->order_replacement($orderReplacementRequest);
+                    if ($orderReplacementResp->AuthResponse->isError == false && $orderReplacementResp->Orders != NULL) {
+                        $sslConfigCompleteDetails = "Alert! Due to DigiCert’s acquisition of Symantec, you must ".$orderReplacementResp->Orders[0]->Action. " your certificate before ".$orderReplacementResp->Orders[0]->ReplaceByDate;
+                    }
+                }
                 $this->view->set("service", $service);
                 $this->view->set("certificate", (object)$certificate);
+                $this->view->set("replacementdetails", $sslConfigCompleteDetails);
                 return $this->view->fetch();
             }
 
@@ -3115,6 +3214,16 @@ class ThesslstoreModule extends Module {
                 $this->view->set("orderMinorStatus", $order_resp->OrderStatus->MinorStatus);
                 $this->view->set("fileName", $fileName);
                 $this->view->set("fileContent", $fileContent);
+                $this->view->set("VendorName", $order_resp->VendorName);
+
+                /* Retrieve the module row for change approver option */
+                $module_rows = $this->getModuleRows();
+                foreach ($module_rows as $row) {
+                    if (isset($row->meta->hide_changeapprover_option)) {
+                        $hide_changeapprover_option = $row->meta->hide_changeapprover_option;
+                    }
+                }
+                $this->view->set("hide_changeapprover_option", $hide_changeapprover_option);
 
                 return $this->view->fetch();
             }
@@ -3188,70 +3297,82 @@ class ThesslstoreModule extends Module {
             $order_resp = $this->getSSLOrderStatus($orderID);
             $fileName=$order_resp->AuthFileName;
             $fileContent=$order_resp->AuthFileContent;
+            $VendorName=$order_resp->VendorName;
+            /* Retrieve the module row for change approver option */
+            $module_rows = $this->getModuleRows();
+            foreach ($module_rows as $row) {
+                if (isset($row->meta->hide_changeapprover_option)) {
+                    $hide_changeapprover_option = $row->meta->hide_changeapprover_option;
+                }
+            }
             if(($order_resp->OrderStatus->MajorStatus=='Pending' || $order_resp->OrderStatus->MinorStatus=='PENDING_REISSUE')&& $fileContent=='' && $fileName=='')
             {
-                $this->view->base_uri = $this->base_uri;
-                $this->view->setDefaultView("components" . DS . "modules" . DS . "thesslstore_module" . DS);
-
-                // Load the helpers required for this view
-                Loader::loadHelpers($this, array("Form", "Html", "Widget"));
-                $productCode=$package->meta->thesslstore_product_code;
-                // Get the service fields
-                $service_fields = $this->serviceFieldsToObject($service->fields);
-                $orderID=$service_fields->thesslstore_order_id;
-                // Call the changeapproveremail function when the save button press
-                if (isset($_POST["save"])) {
-                    $domainsArray=$_POST['domains'];
-                    $emailArray=$_POST['email'];
-                    $approverEmailArray=$_POST['approverEmail'];
-                    $this->changeApproverEmail($approverEmailArray,$domainsArray,$emailArray,$orderID);
-                    if(!$this->errors()){
-                        //Redirect to certificate details page on success
-                        header('Location:' . $this->base_uri . "services/manage/" . ($service->id) . "/tabClientCertDetails/?success=change_mail");
-                        exit();
-                    }
-
-                }
-                // Gether order info using the order status request
-                $order_resp = $this->getSSLOrderStatus($orderID);
-                $domainName=$order_resp->CommonName;
-                $approverEmail=$order_resp->ApproverEmail;
-                $approverEmailArray=explode(',',$approverEmail);
-                $approverEmail=$approverEmailArray[0];
-                $getApproverEmailsList = $this->getApproverEmailsList($productCode,$domainName);
-                $approverEmailsListArray = array_filter(array_diff($getApproverEmailsList, array('support_preprod@geotrust.com','support@geotrust.com')));
-                $this->view->set("domainName", $domainName);
-                $this->view->set("approverEmail", $approverEmail);
-                $this->view->set("approverEmailsListArray", (object)$approverEmailsListArray);
-
-                // Check for the dnsNames for MD products
-                $dnsNames=$order_resp->DNSNames;
-                $dnsNamesArray=explode(',',$dnsNames);
-                if($productCode=='quicksslpremiummd' || ($dnsNamesArray[0]=='' && $dnsNamesArray[0]==NULL))
+                if($VendorName!='SYMANTEC' || ($VendorName=='SYMANTEC' && $hide_changeapprover_option != "YES" ))
                 {
-                    $dnsCount=0;
+                    $this->view->base_uri = $this->base_uri;
+                    $this->view->setDefaultView("components" . DS . "modules" . DS . "thesslstore_module" . DS);
+
+                    // Load the helpers required for this view
+                    Loader::loadHelpers($this, array("Form", "Html", "Widget"));
+                    $productCode = $package->meta->thesslstore_product_code;
+                    // Get the service fields
+                    $service_fields = $this->serviceFieldsToObject($service->fields);
+                    $orderID = $service_fields->thesslstore_order_id;
+                    // Call the changeapproveremail function when the save button press
+                    if (isset($_POST["save"])) {
+                        $domainsArray = $_POST['domains'];
+                        $emailArray = $_POST['email'];
+                        $approverEmailArray = $_POST['approverEmail'];
+                        $this->changeApproverEmail($approverEmailArray, $domainsArray, $emailArray, $orderID);
+                        if (!$this->errors()) {
+                            //Redirect to certificate details page on success
+                            header('Location:' . $this->base_uri . "services/manage/" . ($service->id) . "/tabClientCertDetails/?success=change_mail");
+                            exit();
+                        }
+
+                    }
+                    // Gether order info using the order status request
+                    $order_resp = $this->getSSLOrderStatus($orderID);
+                    $domainName = $order_resp->CommonName;
+                    $approverEmail = $order_resp->ApproverEmail;
+                    $approverEmailArray = explode(',', $approverEmail);
+                    $approverEmail = $approverEmailArray[0];
+                    $getApproverEmailsList = $this->getApproverEmailsList($productCode, $domainName);
+                    $approverEmailsListArray = array_filter(array_diff($getApproverEmailsList, array('support_preprod@geotrust.com', 'support@geotrust.com')));
+                    $this->view->set("domainName", $domainName);
+                    $this->view->set("approverEmail", $approverEmail);
+                    $this->view->set("approverEmailsListArray", (object)$approverEmailsListArray);
+
+                    // Check for the dnsNames for MD products
+                    $dnsNames = $order_resp->DNSNames;
+                    $dnsNamesArray = explode(',', $dnsNames);
+                    if ($productCode == 'quicksslpremiummd' || ($dnsNamesArray[0] == '' && $dnsNamesArray[0] == NULL)) {
+                        $dnsCount = 0;
+                    } else {
+                        $dnsCount = count($dnsNamesArray);
+                    }
+                    $domainNames = array();
+                    $approverEmails = array();
+                    $approverEmailsListArrays = array();
+                    for ($i = 0; $i < $dnsCount; $i++) {
+                        $j = $i + 1;
+                        $domainName = $dnsNamesArray[$i];
+                        $domainNames[] = $dnsNamesArray[$i];
+                        $getApproverEmailsLists = $this->getApproverEmailsList($productCode, $domainName);
+                        $approverEmailsListArrays[] = array_filter(array_diff($getApproverEmailsLists, array('support_preprod@geotrust.com', 'support@geotrust.com')));
+                        $approverEmails[] = $approverEmailArray[$j];
+                    }
+                    $this->view->set("domainNames", $domainNames);
+                    $this->view->set("approverEmails", $approverEmails);
+                    $this->view->set("approverEmailsListArrays", $approverEmailsListArrays);
+
+                    return $this->view->fetch();
                 }
                 else
                 {
-                    $dnsCount=count($dnsNamesArray);
+                    $this->Input->setErrors(array('invalid_action' => array('internal' => Language::_("ThesslstoreModule.!error.change_approver_email_not_available_for_product", true))));
+                    return;
                 }
-                $domainNames=array();
-                $approverEmails=array();
-                $approverEmailsListArrays=array();
-                for($i=0;$i<$dnsCount;$i++)
-                {
-                    $j=$i+1;
-                    $domainName=$dnsNamesArray[$i];
-                    $domainNames[]=$dnsNamesArray[$i];
-                    $getApproverEmailsLists = $this->getApproverEmailsList($productCode,$domainName);
-                    $approverEmailsListArrays[] = array_filter(array_diff($getApproverEmailsLists, array('support_preprod@geotrust.com','support@geotrust.com')));
-                    $approverEmails[]=$approverEmailArray[$j];
-                }
-                $this->view->set("domainNames", $domainNames);
-                $this->view->set("approverEmails", $approverEmails);
-                $this->view->set("approverEmailsListArrays",$approverEmailsListArrays);
-
-                return $this->view->fetch();
             }
             else
             {

@@ -297,3 +297,23 @@ class order_vulnerabilityscanrequest_response extends baseresponse
 {
     public $VulnerabilityScanDetails;
 }
+class order_replacement_response extends baseresponse
+{
+    /*public $PartnerOrderID;
+    public $TheSSLStoreOrderID;
+    public $VendorOrderID;
+    public $OrderStatus;
+    public $OrderAmount;
+    public $CertificateStartDate;
+    public $CertificateEndDate;
+    public $CommonName;
+    public $DNSNames;
+    public $State;
+    public $Country;
+    public $Locality;
+    public $Organization;
+    public $OrganizationalUnit;
+    public $WebServerType;
+    public $ReissueSuccessCode;
+	public $SiteSealurl;*/
+}
