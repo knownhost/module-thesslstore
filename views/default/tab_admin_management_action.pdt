@@ -23,7 +23,7 @@
 
     <?php if(($orderMajorStatus=='Pending' || $orderMinorStatus=='PENDING_REISSUE')&& $fileContent=='' && $fileName=='')
     {
-        if($VendorName=='COMODO' || ($hide_changeapprover_option != "YES" && $VendorName!='COMODO'))
+        if($VendorName!='SYMANTEC' || ($VendorName=='SYMANTEC' && $hide_changeapprover_option != "YES" ))
         {
             $this->Form->create($this->base_uri . "clients/servicetab/" . $this->Html->ifSet($clientID) . "/" . $this->Html->ifSet($serviceID) . "/tabAdminChangeApproverEmail/");
             ?>
