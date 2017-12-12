@@ -557,7 +557,17 @@ class thesslstoreApi
             $resp = new user_newuser_response();
             return $this->postToCurl($url,$user_newuser_request,$resp);
     }
-    
+
+    /**
+     * @param order_replacement_request $order_replacement_request
+     * @return object
+     */
+    public function order_replacement($order_replacement_request)
+    {
+        $url = $this->getURL() . '/order/getsymantecreplacementorders/';
+        $resp = new order_replacement_response();
+        return $this->postToCurl($url,$order_replacement_request,$resp);
+    }
 
 
 

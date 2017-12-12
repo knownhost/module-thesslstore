@@ -78,6 +78,9 @@ if(isset($_GET['success']) && $_GET['success'] == 'change_mail'){
             </div>
             <div class="col-md-9 service-info">
                 <h4><?php $this->Html->_($certificate->vendor_status); ?></h4>
+                <?php if(!empty($replacementdetails )){ ?>
+                <label><?php $this->Html->_($replacementdetails); ?></label>
+                <?php } ?>
             </div>
 
             <div class="col-md-3 service-info">

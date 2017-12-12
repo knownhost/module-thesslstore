@@ -435,4 +435,13 @@ class user_newuser_request extends baserequest
    public $UserType;
    public $HearedBy;
 }
-
+class order_replacement_request extends baserequest
+{
+    /* public $CustomOrderID;
+     public $TheSSLStoreOrderID;
+     public $ActionType;
+     public $Status;
+     public $ReplaceByDate;
+     public $PageNumber;
+     public $PageSize;*/
+}
