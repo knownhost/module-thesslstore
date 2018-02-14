@@ -9,7 +9,7 @@ class ThesslstoreModule extends Module {
     /**
      * @var string The version of this module
      */
-    private static $version = "1.5.0";
+    private static $version = "1.6.0";
 
     /**
      * @var string The name of this module
@@ -2714,10 +2714,20 @@ class ThesslstoreModule extends Module {
         $new_order->isTrialOrder = false;
         $new_order->SignatureHashAlgorithm = $signature_algorithm;
 
+        if($auth_method == 'HTTP' || $auth_method == 'HTTPS') {
+            $approver_list = $this->getApproverEmailsList($product_code, $domain_name);
+            $approver_email = $approver_list[0];
+            foreach($approver_list as $apEmail){
+                if(strpos($apEmail, 'admin@') === 0 || strpos($apEmail, 'administrator@') === 0){
+                    $approver_email = $apEmail;
+                    break;
+                }
+            }
+        }
         if($auth_method == 'HTTP'){
             $new_order->FileAuthDVIndicator = true;
             $new_order->HTTPSFileAuthDVIndicator = false;
-            $new_order->ApproverEmail = 'administrator@'.$clean_domain_name;
+            $new_order->ApproverEmail = $approver_email;
             if($vendor_name == 'COMODO'){
                 $new_order->CSRUniqueValue = date('YmdHisa');
             }
@@ -2725,7 +2735,7 @@ class ThesslstoreModule extends Module {
         elseif($auth_method == 'HTTPS'){
             $new_order->FileAuthDVIndicator = false;
             $new_order->HTTPSFileAuthDVIndicator = true;
-            $new_order->ApproverEmail = 'administrator@'.$clean_domain_name;
+            $new_order->ApproverEmail = $approver_email;
             if($vendor_name == 'COMODO'){
                 $new_order->CSRUniqueValue = date('YmdHisa');
             }
