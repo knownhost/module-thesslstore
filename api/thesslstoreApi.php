@@ -151,9 +151,11 @@ class thesslstoreApi
         }
         else
         {
+            $error = array('isError' => true, 'Message' => array($response->error));
+            $responseData->isError = $error['isError'];
+            $responseData->Message = $error['Message'];
+            $responseData->AuthResponse = (object)$error;
 
-            $responseData->AuthResponse->isError = true;
-            $responseData->AuthResponse->Message = array($response->error);
             return $responseData;
         }
     }
@@ -180,7 +182,7 @@ class thesslstoreApi
         $csrresp = new csr_response();
         return $this->postToCurl($url,$csr_request,$csrresp);
     }
-    
+
     /**
      * @param ssl_validation_request $ssl_validation_request
      * @return ssl_validation_response
@@ -191,7 +193,7 @@ class thesslstoreApi
         $resp =  new ssl_validation_response();
         return $this->postToCurl($url,$ssl_validation_request,$resp);
     }
-    
+
     /**
      * @param whois_request $whois_request
      * @return whois_response
@@ -345,7 +347,7 @@ class thesslstoreApi
             $resp =  new order_query_response();
             return $this->postToCurl($url,$order_query_request,$resp);
     }
-    
+
     /**
      * @param order_vulnerabilityscanrequest_request $order_refundrequest_request
      * @return order_vulnerabilityscanrequest_response
@@ -356,7 +358,7 @@ class thesslstoreApi
             $resp =  new apiresponse();
             return $this->postToCurl($url,$order_certificaterevokerequest_request,$resp);
     }
-    
+
     /**
      * @param order_vulnerabilityscanrequest_request $order_refundrequest_request
      * @return order_vulnerabilityscanrequest_response
@@ -400,7 +402,7 @@ class thesslstoreApi
             $resp = new order_response();
             return $this->postToCurl($url,$order_reissue_request,$resp);
     }
-	
+
 	/**
      * @param order_changeapproveremail_request $order_changeapproveremail_request
      * @return apiresponse
@@ -490,7 +492,7 @@ class thesslstoreApi
             $resp = new apiresponse();
             return $this->postToCurl($url,$setting_settemplate_request,$resp);
     }
-    
+
     /**
      * @param setting_cancelnotification_request $setting_cancelnotification_request
      * @return apiresponse
@@ -519,7 +521,7 @@ class thesslstoreApi
     */
     public function  user_activate($user_activate_request)
     {
-            
+
             $url = $this->getURL() . '/user/activate/';
             $resp = new user_subuser_response();
             return $this->postToCurl($url,$user_activate_request,$resp);
@@ -546,7 +548,7 @@ class thesslstoreApi
             $resp = new user_query_response();
             return $this->postToCurl($url,$user_query_request,$resp);
     }
-    
+
     /**
      * @param user_newuser_request $user_newuser_request
      * @return object
