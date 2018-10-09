@@ -3857,17 +3857,17 @@ class ThesslstoreModule extends Module {
             }
         }
 
-        // Log the response
-        $this->log($this->api_partner_code, serialize($response), "output", $success);
+        // Break the response into segments no longer than the max length that can be logged
+        // (i.e. 64KB = 65535 characters)
+        $responses = str_split(serialize($response), 65535);
+
+        foreach ($responses as $log) {
+            $this->log($this->api_partner_code, $log, "output", $success);
+        }
 
         if (!$success && !$ignore_error)
             return;
 
         return $response;
     }
-
-
-
-
 }
-?>
