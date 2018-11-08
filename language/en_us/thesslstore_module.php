@@ -18,6 +18,10 @@ $lang['ThesslstoreModule.!error.import_package_error'] = "Products already there
 //Success Message
 $lang['ThesslstoreModule.!success.import_package_success'] = "Products Imported Successfully";
 
+// Cron tasks
+$lang['ThesslstoreModule.getCronTasks.tss_order_sync_name'] = "SSL Order Synchronization";
+$lang['ThesslstoreModule.getCronTasks.tss_order_sync_desc'] = "This cron is required to synchronize the order status and certificate expiration updates from The SSL Store.";
+
 // Basics
 $lang['ThesslstoreModule.module_row'] = "TheSSLStore Credential";
 $lang['ThesslstoreModule.module_row_plural'] = "Resellers";
