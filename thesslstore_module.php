@@ -151,9 +151,8 @@ class ThesslstoreModule extends Module {
                 'key' => 'tss_order_sync',
                 'task_type' => 'module',
                 'dir' => 'thesslstore_module',
-                'name' => 'ThesslstoreModule.getCronTasks.tss_order_sync_name',
-                'description' => 'ThesslstoreModule.getCronTasks.tss_order_sync_desc',
-                'is_lang' => 1,
+                'name' => Language::_('ThesslstoreModule.getCronTasks.tss_order_sync_name', true),
+                'description' => Language::_('ThesslstoreModule.getCronTasks.tss_order_sync_desc', true),
                 'type' => 'time',
                 'type_value' => '00:00:00',
                 'enabled' => 1
