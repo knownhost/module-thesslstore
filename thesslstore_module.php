@@ -76,6 +76,42 @@ class ThesslstoreModule extends Module {
     }
 
     /**
+     * Performs any necessary cleanup actions
+     *
+     * @param int $module_id The ID of the module being uninstalled
+     * @param boolean $last_instance True if $module_id is the last instance across
+     *  all companies for this module, false otherwise
+     */
+    public function uninstall($module_id, $last_instance)
+    {
+        if (!isset($this->Record)) {
+            Loader::loadComponents($this, ['Record']);
+        }
+        Loader::loadModels($this,  ['CronTasks']);
+
+        $cron_tasks = $this->getCronTasks();
+
+        if ($last_instance) {
+            // Remove the cron tasks
+            foreach ($cron_tasks as $task) {
+                $cron_task = $this->CronTasks->getByKey($task['key'], $task['dir'], $task['task_type']);
+                if ($cron_task) {
+                    $this->CronTasks->delete($cron_task->id, $task['dir']);
+                }
+            }
+        }
+
+        // Remove individual cron task runs
+        foreach ($cron_tasks as $task) {
+            $cron_task_run = $this->CronTasks
+                ->getTaskRunByKey($task['key'], $task['dir'], false, $task['task_type']);
+            if ($cron_task_run) {
+                $this->CronTasks->deleteTaskRun($cron_task_run->task_run_id);
+            }
+        }
+    }
+
+    /**
      * Performs migration of data from $current_version (the current installed version)
      * to the given file set version. Sets Input errors on failure, preventing
      * the module from being upgraded.
