@@ -96,7 +96,7 @@ class ThesslstoreModule extends Module {
             foreach ($cron_tasks as $task) {
                 $cron_task = $this->CronTasks->getByKey($task['key'], $task['dir'], $task['task_type']);
                 if ($cron_task) {
-                    $this->CronTasks->delete($cron_task->id, $task['dir']);
+                    $this->CronTasks->deleteTask($cron_task->id, 'module', $task['dir']);
                 }
             }
         }
