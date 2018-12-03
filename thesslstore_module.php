@@ -87,7 +87,7 @@ class ThesslstoreModule extends Module {
         if (!isset($this->Record)) {
             Loader::loadComponents($this, ['Record']);
         }
-        Loader::loadModels($this,  ['CronTasks']);
+        Loader::loadModels($this, ['CronTasks']);
 
         $cron_tasks = $this->getCronTasks();
 
@@ -96,7 +96,7 @@ class ThesslstoreModule extends Module {
             foreach ($cron_tasks as $task) {
                 $cron_task = $this->CronTasks->getByKey($task['key'], $task['dir'], $task['task_type']);
                 if ($cron_task) {
-                    $this->CronTasks->deleteTask($cron_task->id, 'module', $task['dir']);
+                    $this->CronTasks->deleteTask($cron_task->id, $task['task_type'], $task['dir']);
                 }
             }
         }
@@ -120,10 +120,10 @@ class ThesslstoreModule extends Module {
      */
     public function upgrade($current_version)
     {
-		// Upgrade if possible
-		if (version_compare($current_version, "1.7.0", "<")) {
-			$this->addCronTasks($this->getCronTasks());
-		}
+        // Upgrade if possible
+        if (version_compare($current_version, '1.7.0', '<')) {
+            $this->addCronTasks($this->getCronTasks());
+        }
     }
 
     /**
@@ -172,7 +172,7 @@ class ThesslstoreModule extends Module {
             $task_id = $this->CronTasks->add($task);
 
             if (!$task_id) {
-                $cron_task = $this->CronTasks->getByKey($task['key'], $task['dir'], $task['type']);
+                $cron_task = $this->CronTasks->getByKey($task['key'], $task['dir'], $task['task_type']);
                 if ($cron_task) {
                     $task_id = $cron_task->id;
                 }
@@ -311,17 +311,17 @@ class ThesslstoreModule extends Module {
      * @return array A list of stdClass objects containing:
      *  - id The ID of the service
      */
-    private function getAllServiceIds(array $filters = array())
+    private function getAllServiceIds(array $filters = [])
     {
-        Loader::loadComponents($this, array('Record'));
+        Loader::loadComponents($this, ['Record']);
 
-        $this->Record->select(array('services.id'))
+        $this->Record->select(['services.id'])
             ->from('services')
                 ->on('service_fields.key', '=', 'thesslstore_order_id')
             ->innerJoin('service_fields', 'service_fields.service_id', '=', 'services.id', false)
             ->innerJoin('clients', 'clients.id', '=', 'services.client_id', false)
             ->innerJoin('client_groups', 'client_groups.id', '=', 'clients.client_group_id', false)
-            ->where('services.status', 'in', array('active', 'suspended'))
+            ->where('services.status', 'in', ['active', 'suspended'])
             ->where('client_groups.company_id', '=', Configure::get('Blesta.company_id'));
 
         if (!empty($filters['renew_start_date'])) {
@@ -332,7 +332,7 @@ class ThesslstoreModule extends Module {
             $this->Record->where('services.date_renews', '<=', $filters['renew_end_date']);
         }
 
-        return $this->Record->group(array('services.id'))
+        return $this->Record->group(['services.id'])
             ->fetchAll();
     }
 
