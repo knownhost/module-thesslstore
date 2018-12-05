@@ -9,7 +9,7 @@ class ThesslstoreModule extends Module {
     /**
      * @var string The version of this module
      */
-    private static $version = "1.6.0";
+    private static $version = "1.7.0";
 
     /**
      * @var string The name of this module
@@ -64,6 +64,276 @@ class ThesslstoreModule extends Module {
      */
     public function getAuthors() {
         return self::$authors;
+    }
+
+    /**
+     * Performs any necessary bootstraping actions
+     */
+    public function install()
+    {
+        // Add cron tasks for this module
+        $this->addCronTasks($this->getCronTasks());
+    }
+
+    /**
+     * Performs any necessary cleanup actions
+     *
+     * @param int $module_id The ID of the module being uninstalled
+     * @param boolean $last_instance True if $module_id is the last instance across
+     *  all companies for this module, false otherwise
+     */
+    public function uninstall($module_id, $last_instance)
+    {
+        if (!isset($this->Record)) {
+            Loader::loadComponents($this, ['Record']);
+        }
+        Loader::loadModels($this, ['CronTasks']);
+
+        $cron_tasks = $this->getCronTasks();
+
+        if ($last_instance) {
+            // Remove the cron tasks
+            foreach ($cron_tasks as $task) {
+                $cron_task = $this->CronTasks->getByKey($task['key'], $task['dir'], $task['task_type']);
+                if ($cron_task) {
+                    $this->CronTasks->deleteTask($cron_task->id, $task['task_type'], $task['dir']);
+                }
+            }
+        }
+
+        // Remove individual cron task runs
+        foreach ($cron_tasks as $task) {
+            $cron_task_run = $this->CronTasks
+                ->getTaskRunByKey($task['key'], $task['dir'], false, $task['task_type']);
+            if ($cron_task_run) {
+                $this->CronTasks->deleteTaskRun($cron_task_run->task_run_id);
+            }
+        }
+    }
+
+    /**
+     * Performs migration of data from $current_version (the current installed version)
+     * to the given file set version. Sets Input errors on failure, preventing
+     * the module from being upgraded.
+     *
+     * @param string $current_version The current installed version of this module
+     */
+    public function upgrade($current_version)
+    {
+        // Upgrade if possible
+        if (version_compare($current_version, '1.7.0', '<')) {
+            $this->addCronTasks($this->getCronTasks());
+        }
+    }
+
+    /**
+     * Runs the cron task identified by the key used to create the cron task
+     *
+     * @param string $key The key used to create the cron task
+     * @see CronTasks::add()
+     */
+    public function cron($key)
+    {
+        if ($key == 'tss_order_sync') {
+            $this->orderSynchronization();
+        }
+    }
+
+    /**
+     * Retrieves cron tasks available to this module along with their default values
+     *
+     * @return array A list of cron tasks
+     */
+    private function getCronTasks()
+    {
+        return [
+            [
+                'key' => 'tss_order_sync',
+                'task_type' => 'module',
+                'dir' => 'thesslstore_module',
+                'name' => Language::_('ThesslstoreModule.getCronTasks.tss_order_sync_name', true),
+                'description' => Language::_('ThesslstoreModule.getCronTasks.tss_order_sync_desc', true),
+                'type' => 'time',
+                'type_value' => '00:00:00',
+                'enabled' => 1
+            ]
+        ];
+    }
+
+    /**
+     * Attempts to add new cron tasks for this module
+     *
+     * @param array $tasks A list of cron tasks to add
+     */
+    private function addCronTasks(array $tasks)
+    {
+        Loader::loadModels($this, ['CronTasks']);
+        foreach ($tasks as $task) {
+            $task_id = $this->CronTasks->add($task);
+
+            if (!$task_id) {
+                $cron_task = $this->CronTasks->getByKey($task['key'], $task['dir'], $task['task_type']);
+                if ($cron_task) {
+                    $task_id = $cron_task->id;
+                }
+            }
+
+            if ($task_id) {
+                $task_vars = ['enabled' => $task['enabled']];
+                if ($task['type'] === 'time') {
+                    $task_vars['time'] = $task['type_value'];
+                } else {
+                    $task_vars['interval'] = $task['type_value'];
+                }
+
+                $this->CronTasks->addTaskRun($task_id, $task_vars);
+            }
+        }
+    }
+
+    /**
+     * Synchronization order data
+     */
+    private function orderSynchronization()
+    {
+        Loader::loadModels($this, ['Services']);
+        Loader::loadHelpers($this, ['Date']);
+        $this->Date->setTimezone('UTC', 'UTC');
+
+        // Get module row id
+        $module_row_id = 0;
+        $api_partner_code = '';
+        $api_auth_token = '';
+        $api_mode = '';
+
+        $rows = $this->getModuleRows();
+        foreach ($rows as $row) {
+            if (isset($row->meta->thesslstore_reseller_name)) {
+                $module_row_id = $row->id;
+                $api_mode = $row->meta->api_mode;
+                if ($api_mode == 'TEST') {
+                    $api_partner_code = $row->meta->api_partner_code_test;
+                    $api_auth_token = $row->meta->api_auth_token_test;
+                } elseif ($api_mode == 'LIVE') {
+                    $api_partner_code = $row->meta->api_partner_code_live;
+                    $api_auth_token = $row->meta->api_auth_token_live;
+                }
+                break;
+            }
+        }
+
+        $api = $this->getApi($api_partner_code, $api_auth_token, $api_mode);
+
+        $two_month_before_date = strtotime('-2 Months') * 1000; // Convert into milliseconds
+        $today_date = strtotime('now') * 1000; // Convert into milliseconds
+
+        $order_query_request = new order_query_request();
+        $order_query_request->StartDate = '/Date(' . $two_month_before_date . ')/';
+        $order_query_request->EndDate = '/Date(' . $today_date . ')/';
+
+        $order_query_resp = $api->order_query($order_query_request);
+
+        // Cannot continue without an order query
+        if (empty($order_query_resp) || !is_array($order_query_resp)) {
+            return;
+        }
+
+        // Fetch all SSL Store module active/suspended services to sync
+        $services = $this->getAllServiceIds();
+
+        // Sync the renew date and FQDN of all SSL Store services
+        foreach ($services as $service) {
+            // Fetch the service
+            if (!($service_obj = $this->Services->get($service->id))) {
+                continue;
+            }
+
+            $fields = $this->serviceFieldsToObject($service_obj->fields);
+
+            // Require the SSL Store order ID field be available
+            if (!isset($fields->thesslstore_order_id)) {
+                continue;
+            }
+
+            foreach ($order_query_resp as $order) {
+                // Skip orders that don't match the service field's order ID
+                if ($order->TheSSLStoreOrderID != $fields->thesslstore_order_id) {
+                    continue;
+                }
+
+                // Update renewal date
+                if (!empty($order->CertificateEndDateInUTC)) {
+                    // Get the date 30 days before the certificate expires
+                    $end_date = $this->Date->modify(
+                        strtotime($order->CertificateEndDateInUTC),
+                        '-30 days',
+                        'Y-m-d H:i:s',
+                        'UTC'
+                    );
+
+                    if ($end_date != $service_obj->date_renews) {
+                        $vars['date_renews'] = $end_date . 'Z';
+                        $this->Services->edit($service_obj->id, $vars, $bypass_module = true);
+                    }
+                }
+
+                // Update domain name(fqdn)
+                if (!empty($order->CommonName)) {
+                    if (isset($fields->thesslstore_fqdn)) {
+                        if ($fields->thesslstore_fqdn != $order->CommonName) {
+                            // Update
+                            $this->Services->editField($service_obj->id, [
+                                'key' => 'thesslstore_fqdn',
+                                'value' => $order->CommonName,
+                                'encrypted' => 0
+                            ]);
+                        }
+                    } else {
+                        // Add
+                        $this->Services->addField($service_obj->id, [
+                            'key' => 'thesslstore_fqdn',
+                            'value' => $order->CommonName,
+                            'encrypted' => 0
+                        ]);
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    /**
+     * Retrieves a list of all service IDs representing active/suspended SSL Store module services for this company
+     *
+     * @param array $filters An array of filter options including:
+     *  - renew_start_date The service's renew date to search from
+     *  - renew_end_date The service's renew date to search to
+     * @return array A list of stdClass objects containing:
+     *  - id The ID of the service
+     */
+    private function getAllServiceIds(array $filters = [])
+    {
+        Loader::loadComponents($this, ['Record']);
+
+        $this->Record->select(['services.id'])
+            ->from('services')
+                ->on('service_fields.key', '=', 'thesslstore_order_id')
+            ->innerJoin('service_fields', 'service_fields.service_id', '=', 'services.id', false)
+            ->innerJoin('clients', 'clients.id', '=', 'services.client_id', false)
+            ->innerJoin('client_groups', 'client_groups.id', '=', 'clients.client_group_id', false)
+            ->where('services.status', 'in', ['active', 'suspended'])
+            ->where('client_groups.company_id', '=', Configure::get('Blesta.company_id'));
+
+        if (!empty($filters['renew_start_date'])) {
+            $this->Record->where('services.date_renews', '>=', $filters['renew_start_date']);
+        }
+
+        if (!empty($filters['renew_end_date'])) {
+            $this->Record->where('services.date_renews', '<=', $filters['renew_end_date']);
+        }
+
+        return $this->Record->group(['services.id'])
+            ->fetchAll();
     }
 
     /**
