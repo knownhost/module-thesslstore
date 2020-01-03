@@ -2157,7 +2157,7 @@ class ThesslstoreModule extends Module {
         $this->log($this->api_partner_code . "|ssl-products", serialize($product_query_request), "input", true);
         $productsArray = $this->parseResponse($api->product_query($product_query_request));
 
-        return !empty($productsArray) ? $productsArray : array();
+        return (!empty($productsArray) || !is_array($productsArray)) ? $productsArray : [];
     }
 
     /**
