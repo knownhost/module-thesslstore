@@ -1674,27 +1674,27 @@ class ThesslstoreModule extends Module {
 
         $product_codes[''] = Language::_("ThesslstoreModule.please_select", true);
         $products = array();
-        foreach($product_data as $product){
-            $product_codes[$product->ProductCode] = $product->ProductName;
+            foreach($product_data as $product){
+                $product_codes[$product->ProductCode] = $product->ProductName;
 
-            $data = array();
-            $data['thesslstore_product_code'] = $product->ProductCode;
-            $data['thesslstore_vendor_name'] = $product->VendorName;
-            $data['thesslstore_is_code_signing'] = ($product->isCodeSigning == true) ? 'y' : 'n';
-            $data['thesslstore_min_san'] = $product->MinSan;
-            $data['thesslstore_is_scan_product'] = ($product->isScanProduct == true) ? 'y' : 'n';
+                $data = array();
+                $data['thesslstore_product_code'] = $product->ProductCode;
+                $data['thesslstore_vendor_name'] = $product->VendorName;
+                $data['thesslstore_is_code_signing'] = ($product->isCodeSigning == true) ? 'y' : 'n';
+                $data['thesslstore_min_san'] = $product->MinSan;
+                $data['thesslstore_is_scan_product'] = ($product->isScanProduct == true) ? 'y' : 'n';
 
-            $validation_type = "N/A";
-            if($product->isDVProduct == true)
-                $validation_type = 'DV';
-            elseif($product->isOVProduct == true)
-                $validation_type = 'OV';
-            elseif($product->isEVProduct == true)
-                $validation_type = 'EV';
+                $validation_type = "N/A";
+                if($product->isDVProduct == true)
+                    $validation_type = 'DV';
+                elseif($product->isOVProduct == true)
+                    $validation_type = 'OV';
+                elseif($product->isEVProduct == true)
+                    $validation_type = 'EV';
 
-            $data['thesslstore_validation_type'] = $validation_type;
-            $products[] = $data;
-        }
+                $data['thesslstore_validation_type'] = $validation_type;
+                $products[] = $data;
+            }
 
         $products = json_encode($products);
 
@@ -1930,7 +1930,10 @@ class ThesslstoreModule extends Module {
             $send_invite_order_email = true;
 
             //if CSR is found then place full order.
-            if(isset($service_fields->thesslstore_csr) && !empty($service_fields->thesslstore_csr)){
+            if ($order_status_response
+                && isset($service_fields->thesslstore_csr)
+                && !empty($service_fields->thesslstore_csr)
+            ) {
 
                 $contact = new contact();
                 $contact->AddressLine1 = $order_status_response->AdminContact->AddressLine1;
@@ -2039,7 +2042,10 @@ class ThesslstoreModule extends Module {
                 $api_with_token = $this->getApi(null,null,'',$IsUsedForTokenSystem = true, $thesslstore_token);
                 $this->log($this->api_partner_code . "|ssl-full-renew-order", serialize($new_order), "input", true);
                 $new_order_resp = $this->parseResponse($api_with_token->order_neworder($new_order),$ignore_error = true);
-                if(isset($new_order_resp->AuthResponse->isError) && $new_order_resp->AuthResponse->isError == false){
+                if ($new_order_resp
+                    && isset($new_order_resp->AuthResponse->isError)
+                    && $new_order_resp->AuthResponse->isError == false
+                ) {
                     $send_invite_order_email = false;
                 }
             }
@@ -2151,7 +2157,7 @@ class ThesslstoreModule extends Module {
         $this->log($this->api_partner_code . "|ssl-products", serialize($product_query_request), "input", true);
         $productsArray = $this->parseResponse($api->product_query($product_query_request));
 
-        return $productsArray;
+        return (!empty($productsArray) && is_array($productsArray)) ? $productsArray : [];
     }
 
     /**
@@ -2518,7 +2524,7 @@ class ThesslstoreModule extends Module {
                 $use_central_api = true;
             }
 
-            if ($order_resp->OrderStatus->MajorStatus == 'Initial') {
+            if ($order_resp && $order_resp->OrderStatus->MajorStatus == 'Initial') {
 
                 $contact_number = '';
                 //get client data to prefiiled data
@@ -2597,7 +2603,7 @@ class ThesslstoreModule extends Module {
                             if ($post['thesslstore_auth_method'] == 'EMAIL') {
                                 //get main domain name from the CSR
                                 $validate_csr_resp = $this->validateCSR($post['thesslstore_csr'], $product_code);
-                                $common_name = $validate_csr_resp->DomainName;
+                                $common_name = $validate_csr_resp ? $validate_csr_resp->DomainName : '';
 
                                 //get Approver Email list
                                 $approver_email_list_resp = $this->getApproverEmailsList($product_code, $common_name);
@@ -2762,8 +2768,8 @@ class ThesslstoreModule extends Module {
                     $auth_file_content = '';
                     if ($auth_method != 'EMAIL') {
                         $order_status = $this->getSSLOrderStatus($thesslstore_order_id);
-                        $auth_file_name = $order_status->AuthFileName;
-                        $auth_file_content = $order_status->AuthFileContent;
+                        $auth_file_name = $order_status ? $order_status->AuthFileName : '';
+                        $auth_file_content = $order_status ? $order_status->AuthFileContent : '';
                     }
                     $this->view->set("auth_file_name", $auth_file_name);
                     $this->view->set("auth_file_content", $auth_file_content);
@@ -2908,7 +2914,7 @@ class ThesslstoreModule extends Module {
         //call validate CSR to get domain name
         $validate_csr_resp = $this->validateCSR($csr, $product_code);
 
-        $domain_name = $validate_csr_resp->DomainName;
+        $domain_name = $validate_csr_resp ? $validate_csr_resp->DomainName : '';
         $clean_domain_name = str_replace(array('www.','*.'),"",$domain_name);
 
 
@@ -3025,7 +3031,7 @@ class ThesslstoreModule extends Module {
         if($results != NULL && $results->AuthResponse->isError == false){
             //call order status after placed full order to get common name
             $order_status = $this->getSSLOrderStatus($thesslstore_order_id);
-            $fqdn_name = $order_status->CommonName;
+            $fqdn_name = $order_status ? $order_status->CommonName : '';
 
             //store service fields
             Loader::loadModels($this, array("Services"));
@@ -3198,8 +3204,10 @@ class ThesslstoreModule extends Module {
                                         } else {
                                             $step = 3; //display step 3 when successfully reissue
                                             $new_order_resp = $this->getSSLOrderStatus($service_fields->thesslstore_order_id);
-                                            $auth_file_name = $new_order_resp->AuthFileName;
-                                            $auth_file_content = $new_order_resp->AuthFileContent;
+                                            $auth_file_name = $new_order_resp ? $new_order_resp->AuthFileName : '';
+                                            $auth_file_content = $new_order_resp
+                                                ? $new_order_resp->AuthFileContent
+                                                : '';
                                         }
                                     }
                                 } elseif ($step == 2) {
@@ -3210,8 +3218,8 @@ class ThesslstoreModule extends Module {
                                     } else {
                                         $step = 3; //display step 3 when successfully reissue
                                         $new_order_resp = $this->getSSLOrderStatus($service_fields->thesslstore_order_id);
-                                        $auth_file_name = $new_order_resp->AuthFileName;
-                                        $auth_file_content = $new_order_resp->AuthFileContent;
+                                        $auth_file_name = $new_order_resp ? $new_order_resp->AuthFileName : '';
+                                        $auth_file_content = $new_order_resp ? $new_order_resp->AuthFileContent : '';
                                     }
                                 }
                             } else {
@@ -3483,7 +3491,7 @@ class ThesslstoreModule extends Module {
             // Gether order info using the order status request
             $order_resp = $this->getSSLOrderStatus($orderID);
             //Major Status Initial
-            if($order_resp->OrderStatus->MajorStatus!='Initial')
+            if ($order_resp && $order_resp->OrderStatus->MajorStatus!='Initial')
             {
                 $fileName = $order_resp->AuthFileName;
                 $fileContent = $order_resp->AuthFileContent;
@@ -3585,8 +3593,12 @@ class ThesslstoreModule extends Module {
                     $hide_changeapprover_option = $row->meta->hide_changeapprover_option;
                 }
             }
-            if(($order_resp->OrderStatus->MajorStatus=='Pending' || $order_resp->OrderStatus->MinorStatus=='PENDING_REISSUE')&& $fileContent=='' && $fileName=='')
-            {
+            if ($order_resp
+                && ($order_resp->OrderStatus->MajorStatus == 'Pending'
+                    || $order_resp->OrderStatus->MinorStatus == 'PENDING_REISSUE')
+                && $fileContent == ''
+                && $fileName == ''
+            ) {
                 if($VendorName!='SYMANTEC' || ($VendorName=='SYMANTEC' && $hide_changeapprover_option != "YES" ))
                 {
                     $this->view->base_uri = $this->base_uri;
@@ -3613,8 +3625,8 @@ class ThesslstoreModule extends Module {
                     }
                     // Gether order info using the order status request
                     $order_resp = $this->getSSLOrderStatus($orderID);
-                    $domainName = $order_resp->CommonName;
-                    $approverEmail = $order_resp->ApproverEmail;
+                    $domainName = $order_resp ? $order_resp->CommonName : '';
+                    $approverEmail = $order_resp ? $order_resp->ApproverEmail : '';
                     $approverEmailArray = explode(',', $approverEmail);
                     $approverEmail = $approverEmailArray[0];
                     $getApproverEmailsList = $this->getApproverEmailsList($productCode, $domainName);
@@ -3747,8 +3759,8 @@ class ThesslstoreModule extends Module {
             $orderID=$service_fields->thesslstore_order_id;
             // Gether order info using the order status request
             $order_resp = $this->getSSLOrderStatus($orderID);
-            $fileName=$order_resp->AuthFileName;
-            $fileContent=$order_resp->AuthFileContent;
+            $fileName = $order_resp ? $order_resp->AuthFileName : '';
+            $fileContent = $order_resp ? $order_resp->AuthFileContent : '';
             if(($order_resp->OrderStatus->MajorStatus=='Pending' || $order_resp->OrderStatus->MinorStatus=='PENDING_REISSUE'))
             {
                 if(!$fileName && !$fileContent)
@@ -3805,7 +3817,7 @@ class ThesslstoreModule extends Module {
             $downloadResp = $api->order_download_zip($downloadReq);
             // Gether order info using the order status request
             $order_resp = $this->getSSLOrderStatus($orderID);
-            if ($order_resp->OrderStatus->MajorStatus == 'Active')
+            if ($order_resp && $order_resp->OrderStatus->MajorStatus == 'Active')
             {
                 if (!$downloadResp->AuthResponse->isError) {
                     $certdecoded = base64_decode($downloadResp->Zip);
