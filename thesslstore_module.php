@@ -2170,13 +2170,13 @@ class ThesslstoreModule extends Module {
     public function getClientTabs($package) {
 
         return array(
-            'tabClientCertDetails' => array('name' => Language::_("ThesslstoreModule.tab_CertDetails", true),'icon' => 'fa fa-bars'),
-            'tabClientGenerateCert' => array('name' => Language::_("ThesslstoreModule.tab_GenerateCert", true),'icon' => 'fa fa-cogs'),
-            'tabClientDownloadCertificate' =>array('name' => Language::_("ThesslstoreModule.tab_DownloadCertificate", true), 'icon' => 'fa fa-certificate'),
-            'tabClientDownloadAuthFile' => array('name' => Language::_("ThesslstoreModule.tab_DownloadAuthFile", true),'icon' => 'fa fa-file'),
-            'tabClientChangeApproverEmail' => array('name' => Language::_("ThesslstoreModule.tab_ChangeApproverEmail", true),'icon' => 'fa fa-exchange'),
-            'tabClientResendApproverEmail' => array('name' => Language::_("ThesslstoreModule.tab_ResendApproverEmail",true),'icon' => 'fa fa-refresh'),
-            'tabClientReissueCert' => array('name' => Language::_("ThesslstoreModule.tab_ReissueCert",true),'icon' => 'fa fa-repeat')
+            'tabClientCertDetails' => array('name' => Language::_("ThesslstoreModule.tab_CertDetails", true),'icon' => 'fas fa-bars'),
+            'tabClientGenerateCert' => array('name' => Language::_("ThesslstoreModule.tab_GenerateCert", true),'icon' => 'fas fa-cogs'),
+            'tabClientDownloadCertificate' =>array('name' => Language::_("ThesslstoreModule.tab_DownloadCertificate", true), 'icon' => 'fas fa-certificate'),
+            'tabClientDownloadAuthFile' => array('name' => Language::_("ThesslstoreModule.tab_DownloadAuthFile", true),'icon' => 'fas fa-file'),
+            'tabClientChangeApproverEmail' => array('name' => Language::_("ThesslstoreModule.tab_ChangeApproverEmail", true),'icon' => 'fas fa-exchange-alt'),
+            'tabClientResendApproverEmail' => array('name' => Language::_("ThesslstoreModule.tab_ResendApproverEmail",true),'icon' => 'fas fa-sync-alt'),
+            'tabClientReissueCert' => array('name' => Language::_("ThesslstoreModule.tab_ReissueCert",true),'icon' => 'fas fa-redo-alt')
         );
     }
 
