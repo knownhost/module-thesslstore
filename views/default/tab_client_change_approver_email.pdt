@@ -57,7 +57,7 @@
             <?php
             }
             ?>
-            <button class="btn btn-default pull-left" type="submit" name="save">
+            <button class="btn btn-light float-left" type="submit" name="save">
                 		<?php $this->_("ThesslstoreModule.change_approver_email.save_btn");?>
             </button>
         </div>

@@ -50,7 +50,7 @@
         </div>
     </div>
 
-    <button class="btn btn-default pull-right" type="submit">
+    <button class="btn btn-light float-right" type="submit">
        <?php $this->_("ThesslstoreModule.tab_generate_cert_step1.submit");?>
     </button>
 <?php

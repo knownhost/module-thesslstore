@@ -25,7 +25,7 @@
             			$this->Form->end();
             			?>
 		    <div class="links_row button_row">
-			    <a target="_blank" class="pull-right btn btn-default" href="<?php $this->Html->_($export_to_csv_link); ?>"><?php $this->_("ThesslstoreModule.replacement_order.export_csv"); ?> </a>
+			    <a target="_blank" class="float-right btn btn-default" href="<?php $this->Html->_($export_to_csv_link); ?>"><?php $this->_("ThesslstoreModule.replacement_order.export_csv"); ?> </a>
             </div>
 		    <table class="table">
                 <tbody>
