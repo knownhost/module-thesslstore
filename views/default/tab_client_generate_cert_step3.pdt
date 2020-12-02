@@ -19,7 +19,7 @@
                 File Content: <?php $this->Html->_($auth_file_content); ?>
             </p>
             <p>
-                <a href="<?php $this->Html->_($download_auth_file_link); ?>" class="btn btn-default btn-xs" type="button">
+                <a href="<?php $this->Html->_($download_auth_file_link); ?>" class="btn btn-light btn-xs" type="button">
                     <?php $this->_("ThesslstoreModule.tab_DownloadAuthFile");?>
                 </a>
             </p>

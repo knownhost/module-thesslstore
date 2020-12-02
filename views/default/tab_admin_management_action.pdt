@@ -3,7 +3,7 @@
     {
         $this->Form->create($this->base_uri . "clients/servicetab/" . $this->Html->ifSet($clientID) . "/" . $this->Html->ifSet($serviceID) . "/tabClientDownloadAuthFile/");
         ?>
-        <button class="btn btn-default pull-left" type="submit" name="save">
+        <button class="btn btn-default float-left" type="submit" name="save">
             <?php $this->_("ThesslstoreModule.tab_DownloadAuthFile");?>
         </button>
         <?php
@@ -14,7 +14,7 @@
     {
         $this->Form->create($this->base_uri . "clients/servicetab/" . $this->Html->ifSet($clientID) . "/" . $this->Html->ifSet($serviceID) . "/tabClientDownloadCertificate/");
         ?>
-        <button class="btn btn-default pull-left" type="submit" name="save">
+        <button class="btn btn-default float-left" type="submit" name="save">
             <?php $this->_("ThesslstoreModule.tab_DownloadCertificate");?>
         </button>
         <?php
