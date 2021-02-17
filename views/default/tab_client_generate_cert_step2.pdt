@@ -1,5 +1,5 @@
 <?php
-    $this->Form->create($this->base_uri . "services/manage/" . $this->Html->ifSet($service_id) . "/tabClientGenerateCert/");
+    $this->Form->create($this->base_uri . "services/manage/" . (isset($service_id) ? $service_id : null) . "/tabClientGenerateCert/");
 
     $this->Form->fieldHidden("thesslstore_gen_step", $step);
     $this->Form->fieldHidden("thesslstore_csr", $vars->thesslstore_csr);
@@ -42,7 +42,7 @@
             <div class="form-group">
                 <?php
                 $this->Form->label($dm.'*', "for_".$dm);
-                $this->Form->fieldSelect("thesslstore_approver_emails[]", $this->Html->ifSet($email_list), $this->Html->ifSet($vars->thesslstore_webserver_type), array('id' => "for_".$dm, 'class'=>"form-control"));
+                $this->Form->fieldSelect("thesslstore_approver_emails[]", (isset($email_list) ? $email_list : null), (isset($vars->thesslstore_webserver_type) ? $vars->thesslstore_webserver_type : null), array('id' => "for_".$dm, 'class'=>"form-control"));
                 ?>
             </div>
             <?php

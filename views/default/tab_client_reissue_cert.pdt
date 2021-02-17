@@ -1,6 +1,6 @@
 <?php
 if ($use_central_api != true ) {
-    $this->Form->create($this->base_uri . "services/manage/" . $this->Html->ifSet($service_id) . "/tabClientReissueCert/");
+    $this->Form->create($this->base_uri . "services/manage/" . (isset($service_id) ? $service_id : null) . "/tabClientReissueCert/");
     $this->Form->fieldHidden("thesslstore_reissue_step", $step);
     ?>
     <div class="row panel-fix">
@@ -13,19 +13,19 @@ if ($use_central_api != true ) {
                 <div class="form-group">
                     <?php
                     $this->Form->label($this->_("ThesslstoreModule.service_field.thesslstore_csr", true).'*', "thesslstore_csr");
-                    $this->Form->fieldTextArea("thesslstore_csr", $this->Html->ifSet($thesslstore_csr), array('id' => "thesslstore_csr", 'class'=>"form-control", 'rows'=>8));
+                    $this->Form->fieldTextArea("thesslstore_csr", (isset($thesslstore_csr) ? $thesslstore_csr : null), array('id' => "thesslstore_csr", 'class'=>"form-control", 'rows'=>8));
                     ?>
                 </div>
                 <div class="form-group">
                     <?php
                     $this->Form->label($this->_("ThesslstoreModule.service_field.thesslstore_webserver_type", true).'*', "thesslstore_webserver_type");
-                    $this->Form->fieldSelect("thesslstore_webserver_type", $this->Html->ifSet($thesslstore_webserver_types), $this->Html->ifSet($thesslstore_webserver_type), array('id' => "thesslstore_webserver_type", 'class'=>"form-control"));
+                    $this->Form->fieldSelect("thesslstore_webserver_type", (isset($thesslstore_webserver_types) ? $thesslstore_webserver_types : null), (isset($thesslstore_webserver_type) ? $thesslstore_webserver_type : null), array('id' => "thesslstore_webserver_type", 'class'=>"form-control"));
                     ?>
                 </div>
                 <div class="form-group">
                     <?php
                     $this->Form->label($this->_("ThesslstoreModule.service_field.thesslstore_signature_algorithm", true).'*', "thesslstore_signature_algorithm");
-                    $this->Form->fieldSelect("thesslstore_signature_algorithm", $this->Html->ifSet($thesslstore_signature_algorithms), $this->Html->ifSet($thesslstore_signature_algorithm), array('id' => "thesslstore_signature_algorithm", 'class'=>"form-control"));
+                    $this->Form->fieldSelect("thesslstore_signature_algorithm", (isset($thesslstore_signature_algorithms) ? $thesslstore_signature_algorithms : null), (isset($thesslstore_signature_algorithm) ? $thesslstore_signature_algorithm : null), array('id' => "thesslstore_signature_algorithm", 'class'=>"form-control"));
                     ?>
                 </div>
 
@@ -38,7 +38,7 @@ if ($use_central_api != true ) {
                         <div class="form-group">
                             <?php
                             $this->Form->label($this->_("ThesslstoreModule.service_field.thesslstore_additional_san", true).$i, "thesslstore_additional_san".$i);
-                            $this->Form->fieldText("thesslstore_additional_san[]", $this->Html->ifSet($thesslstore_additional_san[$i - 1]), array('id' => "thesslstore_additional_san".$i, 'class'=>"form-control"));
+                            $this->Form->fieldText("thesslstore_additional_san[]", (isset($thesslstore_additional_san[$i - 1]) ? $thesslstore_additional_san[$i - 1] : null), array('id' => "thesslstore_additional_san".$i, 'class'=>"form-control"));
                             ?>
                         </div>
                     <?php
@@ -97,7 +97,7 @@ if ($use_central_api != true ) {
                     <div class="form-group">
                         <?php
                         $this->Form->label($dm.'*', "for_".$dm);
-                        $this->Form->fieldSelect("thesslstore_approver_emails[]", $this->Html->ifSet($email_list), $selected, array('id' => "for_".$dm, 'class'=>"form-control"));
+                        $this->Form->fieldSelect("thesslstore_approver_emails[]", (isset($email_list) ? $email_list : null), $selected, array('id' => "for_".$dm, 'class'=>"form-control"));
                         ?>
                     </div>
                 <?php

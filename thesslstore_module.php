@@ -1704,27 +1704,27 @@ class ThesslstoreModule extends Module {
         // Set the product as a selectable option
         $thesslstore_product_code = $fields->label(Language::_("ThesslstoreModule.package_fields.product_code", true), "thesslstore_product_code");
         $thesslstore_product_code->attach($fields->fieldSelect("meta[thesslstore_product_code]", $product_codes,
-            $this->Html->ifSet($vars->meta['thesslstore_product_code']), array('id' => "thesslstore_product_code","onchange" => "javascript:get_ssl_meta(this.value)")));
+            (isset($vars->meta['thesslstore_product_code']) ? $vars->meta['thesslstore_product_code'] : null), array('id' => "thesslstore_product_code","onchange" => "javascript:get_ssl_meta(this.value)")));
         $fields->setField($thesslstore_product_code);
         unset($thesslstore_product_code);
 
-        $field_thesslstore_vendor_name = $fields->fieldHidden( "meta[thesslstore_vendor_name]",$this->Html->ifSet($vars->meta['thesslstore_vendor_name']),array('id' => "thesslstore_vendor_name") );
+        $field_thesslstore_vendor_name = $fields->fieldHidden( "meta[thesslstore_vendor_name]",(isset($vars->meta['thesslstore_vendor_name']) ? $vars->meta['thesslstore_vendor_name'] : null),array('id' => "thesslstore_vendor_name") );
         $fields->setField($field_thesslstore_vendor_name);
         unset($field_thesslstore_vendor_name);
 
-        $field_thesslstore_is_code_signing = $fields->fieldHidden( "meta[thesslstore_is_code_signing]",$this->Html->ifSet($vars->meta['thesslstore_is_code_signing']),array('id' => "thesslstore_is_code_signing") );
+        $field_thesslstore_is_code_signing = $fields->fieldHidden( "meta[thesslstore_is_code_signing]",(isset($vars->meta['thesslstore_is_code_signing']) ? $vars->meta['thesslstore_is_code_signing'] : null),array('id' => "thesslstore_is_code_signing") );
         $fields->setField($field_thesslstore_is_code_signing);
         unset($field_thesslstore_is_code_signing);
 
-        $field_thesslstore_min_san = $fields->fieldHidden( "meta[thesslstore_min_san]",$this->Html->ifSet($vars->meta['thesslstore_min_san']),array('id' => "thesslstore_min_san") );
+        $field_thesslstore_min_san = $fields->fieldHidden( "meta[thesslstore_min_san]",(isset($vars->meta['thesslstore_min_san']) ? $vars->meta['thesslstore_min_san'] : null),array('id' => "thesslstore_min_san") );
         $fields->setField($field_thesslstore_min_san);
         unset($field_thesslstore_min_san);
 
-        $field_thesslstore_is_scan_product = $fields->fieldHidden( "meta[thesslstore_is_scan_product]",$this->Html->ifSet($vars->meta['thesslstore_is_scan_product']),array('id' => "thesslstore_is_scan_product") );
+        $field_thesslstore_is_scan_product = $fields->fieldHidden( "meta[thesslstore_is_scan_product]",(isset($vars->meta['thesslstore_is_scan_product']) ? $vars->meta['thesslstore_is_scan_product'] : null),array('id' => "thesslstore_is_scan_product") );
         $fields->setField($field_thesslstore_is_scan_product);
         unset($field_thesslstore_is_scan_product);
 
-        $field_thesslstore_validation_type = $fields->fieldHidden( "meta[thesslstore_validation_type]",$this->Html->ifSet($vars->meta['thesslstore_validation_type']),array('id' => "thesslstore_validation_type") );
+        $field_thesslstore_validation_type = $fields->fieldHidden( "meta[thesslstore_validation_type]",(isset($vars->meta['thesslstore_validation_type']) ? $vars->meta['thesslstore_validation_type'] : null),array('id' => "thesslstore_validation_type") );
         $fields->setField($field_thesslstore_validation_type);
         unset($field_thesslstore_validation_type);
 

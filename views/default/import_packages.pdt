@@ -21,7 +21,7 @@
             </section>
         <?php
         }
-		echo $this->Html->ifSet($message);
+		echo (isset($message) ? $message : null);
 
 		$this->Widget->clear();
 		$this->Widget->create($this->_("ThesslstoreModule.add_row.box_title", true));
@@ -47,13 +47,13 @@
 					<li>
 					<?php
                     	$this->Form->label($this->_("ThesslstoreModule.row_meta.product_group", true), "product_group");
-                        $this->Form->fieldSelect("product_group",$vars->packageGroups, $this->Html->ifSet($vars->product_group), array('id' => "product_group"));
+                        $this->Form->fieldSelect("product_group",$vars->packageGroups, (isset($vars->product_group) ? $vars->product_group : null), array('id' => "product_group"));
                     ?>
 					</li>
 					<li>
                     <?php
                         $this->Form->label($this->_("ThesslstoreModule.row_meta.profit_margin", true), "profit_margin");
-                       	$this->Form->fieldText("profit_margin", $this->Html->ifSet($vars->profit_margin), array('id' => "profit_margin"));
+                       	$this->Form->fieldText("profit_margin", (isset($vars->profit_margin) ? $vars->profit_margin : null), array('id' => "profit_margin"));
                     ?>
                     </li>
 					<li>
