@@ -10,16 +10,16 @@
         <?php
         } else{ ?>
 	    <p>
-                For File Based Authentication, Please create a folder structure "/.well-known/pki-validation/" under root directory and create file using following details or download the Authentication file by clicking the "Download Auth File" button and place it in the "/.well-known/pki-validation/" of the HTTP server, like so: http://www.example.com/.well-known/pki-validation/<?php $this->Html->_($auth_file_name); ?> It may take some time for file to be automatically validated and cert to be issued by Certificate Authority.
+                For File Based Authentication, Please create a folder structure "/.well-known/pki-validation/" under root directory and create file using following details or download the Authentication file by clicking the "Download Auth File" button and place it in the "/.well-known/pki-validation/" of the HTTP server, like so: http://www.example.com/.well-known/pki-validation/<?php (echo isset($auth_file_name) ? $this->Html->safe($auth_file_name) : null); ?> It may take some time for file to be automatically validated and cert to be issued by Certificate Authority.
             </p>
             <p>
-                File Name: <?php $this->Html->_($auth_file_name); ?>
+                File Name: <?php (echo isset($auth_file_name) ? $this->Html->safe($auth_file_name) : null); ?>
             </p>
             <p>
-                File Content: <?php $this->Html->_($auth_file_content); ?>
+                File Content: <?php (echo isset($auth_file_content) ? $this->Html->safe($auth_file_content) : null); ?>
             </p>
             <p>
-                <a href="<?php $this->Html->_($download_auth_file_link); ?>" class="btn btn-light btn-xs" type="button">
+                <a href="<?php (echo isset($download_auth_file_link) ? $this->Html->safe($download_auth_file_link) : null); ?>" class="btn btn-light btn-xs" type="button">
                     <?php $this->_("ThesslstoreModule.tab_DownloadAuthFile");?>
                 </a>
             </p>
