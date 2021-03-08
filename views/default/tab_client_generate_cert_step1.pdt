@@ -4,7 +4,7 @@
         <div class="row panel-fix">
              <div class="col-md-12">
                 <h4><?php $this->_("ThesslstoreModule.tab_GenerateCert");?></h4>
-                <a target="_blank" href="<?php (echo isset($cert_generation_link) ? $this->Html->safe($cert_generation_link) : null); ?>" class="btn btn-light" type="button"><?php $this->_("ThesslstoreModule.tab_GenerateCert"); ?></a>
+                <a target="_blank" href="<?php echo (isset($cert_generation_link) ? $this->Html->safe($cert_generation_link) : null); ?>" class="btn btn-light" type="button"><?php $this->_("ThesslstoreModule.tab_GenerateCert"); ?></a>
              </div>
         </div>
     <?php

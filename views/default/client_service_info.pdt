@@ -10,10 +10,10 @@
 			</thead>
 			<tbody>
 				<tr>
-					<td><?php (echo isset($store_order_id) ? $this->Html->safe($store_order_id) : null);?></td>
-					<td><?php (echo isset($vendor_order_id) ? $this->Html->safe($vendor_order_id) : null);?></td>
-					<td><?php (echo isset($major_status) ? $this->Html->safe($major_status) : null);?></td>
-					<td><?php (echo isset($minor_status) ? $this->Html->safe($minor_status) : null);?></td>
+					<td><?php echo (isset($store_order_id) ? $this->Html->safe($store_order_id) : null);?></td>
+					<td><?php echo (isset($vendor_order_id) ? $this->Html->safe($vendor_order_id) : null);?></td>
+					<td><?php echo (isset($major_status) ? $this->Html->safe($major_status) : null);?></td>
+					<td><?php echo (isset($minor_status) ? $this->Html->safe($minor_status) : null);?></td>
 				</tr>
 			</tbody>
 		</table>
