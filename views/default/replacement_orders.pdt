@@ -25,7 +25,7 @@
             			$this->Form->end();
             			?>
 		    <div class="links_row button_row">
-			    <a target="_blank" class="float-right btn btn-default" href="<?php $this->Html->_($export_to_csv_link); ?>"><?php $this->_("ThesslstoreModule.replacement_order.export_csv"); ?> </a>
+			    <a target="_blank" class="float-right btn btn-default" href="<?php echo (isset($export_to_csv_link) ? $this->Html->safe($export_to_csv_link) : null); ?>"><?php $this->_("ThesslstoreModule.replacement_order.export_csv"); ?> </a>
             </div>
 		    <table class="table">
                 <tbody>
@@ -54,15 +54,15 @@
                             }
                             ?>
                             <tr <?php echo $class; ?> >
-                                <td><?php $this->Html->_($order->PurchaseDate); ?></td>
-                                <td><?php $this->Html->_($order->TheSSLStoreOrderID); ?></td>
-                                <td><?php $this->Html->_($order->VendorOrderID); ?></td>
-                                <td><?php $this->Html->_($order->ProductName); ?></td>
-                                <td><?php $this->Html->_($order->CertificateStartDate); ?></td>
-                                <td><?php $this->Html->_($order->CertificateEndDate); ?></td>
-                                <td><?php $this->Html->_($order->Status); ?></td>
-                                <td><?php $this->Html->_($order->Action); ?></td>
-                                <td><?php $this->Html->_($order->ReplaceByDate); ?></td>
+                                <td><?php echo (isset($order->PurchaseDate) ? $this->Html->safe($order->PurchaseDate) : null); ?></td>
+                                <td><?php echo (isset($order->TheSSLStoreOrderID) ? $this->Html->safe($order->TheSSLStoreOrderID) : null); ?></td>
+                                <td><?php echo (isset($order->VendorOrderID) ? $this->Html->safe($order->VendorOrderID) : null); ?></td>
+                                <td><?php echo (isset($order->ProductName) ? $this->Html->safe($order->ProductName) : null); ?></td>
+                                <td><?php echo (isset($order->CertificateStartDate) ? $this->Html->safe($order->CertificateStartDate) : null); ?></td>
+                                <td><?php echo (isset($order->CertificateEndDate) ? $this->Html->safe($order->CertificateEndDate) : null); ?></td>
+                                <td><?php echo (isset($order->Status) ? $this->Html->safe($order->Status) : null); ?></td>
+                                <td><?php echo (isset($order->Action) ? $this->Html->safe($order->Action) : null); ?></td>
+                                <td><?php echo (isset($order->ReplaceByDate) ? $this->Html->safe($order->ReplaceByDate) : null); ?></td>
                             </tr>
 <?php
                         }
