@@ -1281,14 +1281,15 @@ class ThesslstoreModule extends Module {
                 foreach ($products as $key => $value) {
                     if(!in_array($value->ProductCode, $already_added_packages)){
 
-                        $packageArray['name'] = $value->ProductName;
+                        $packageArray['names'] = [['lang' => 'en_us', 'name' => $value->ProductName]];
                         $packageArray['status'] = 'active';
                         $packageArray['qty_unlimited'] = 'true';
                         $ProductDescription = $value->ProductDescription;
                         $sslfeaturelink = $value->ProductSlug;
                         $viewmorelink = "<a class='mod_view_more' href='javascript&#58;void(0);' onclick=\"window.open('$sslfeaturelink','null','location=no,toolbar=no,menubar=no,scrollbars=yes,resizable=yes,addressbar=0,titlebar=no,directories=no,channelmode=no,status=no');\"> View Full Product Details</a>";
-                        $packageArray['description_html'] = $ProductDescription . $viewmorelink;
-                        $packageArray['description'] = '';
+                        $packageArray['descriptions'] = [
+                            ['lang' => 'en_us', 'text' => '', 'html' => $ProductDescription . $viewmorelink]
+                        ];
                         $profitmargin = $vars['profit_margin'];
 
 
